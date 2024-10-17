@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Schedule</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    th {
+       text-align: center;
+    }
+
+    .month {
+       text-align: center;
+    }
+
+
+    h1, h2, h3, h4, h5, h6 {
+    color: #333; /* Dark grey color for contrast */
+    text-shadow: 1px 1px 2px white; /* Optional: adds a subtle shadow for better legibility */
+  }
+
+  .nav-item a {
+    display: block; /* Ensures the link fills the container */
+    background-color: #e8f4f8; /* Light blue for a soft appearance */
+    color: #333; /* Darker text for better contrast */
+    padding: 10px 15px; /* Ample padding for clickable area */
+    margin: 5px 0; /* Margins removed from the sides */
+    border-radius: 5px; /* Smooth, rounded corners */
+    border: 1px solid #b6d4e7; /* Light blue border that complements the background */
+    text-decoration: none; /* Removes underline */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  }
+
+  .nav-item a:hover, .nav-item a.active {
+    background-color: #fcb69f; /* Soft peach color for a gentle hover effect */
+    color: #fff; /* White text to stand out on hover */
+    border-color: #fa8072; /* Slightly darker border on hover to define edges */
+  }
+  .navbar-dark .navbar-nav .nav-link {
+    color: black; /* Changes text color to black */
+  }
+
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: #ff6347; /* Keeps the hover color as vibrant tomato red */
+  }
+
+  .nav-item text-nowrap {
+    color: black;
+  }
+  .nav-link:hover {
+    color: #ff6347; /* Vibrant tomato red on hover for better visibility */
+  }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">TCSS</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+      data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" href="/logout">Sign out</a>
+      </li>
+    </ul>
+  </nav>
+
+<div class="container mt-5">
+    <h2>My Schedule - {{ lecturer }}</h2>
+    <br>
+    {% if schedule_dates %}
+        {% for year in schedule_dates %}
+            {% if year.year == date.year %}
+                {% for month in year.months %}
+                    {% if month == date.month %}
+                        <h2>This Month</h2>
+                        <table class="table">
+                            <tr>
+                                <th colspan="3">
+                                    <h3>{{ date.month}}</h3>
+                                </th>
+                            </tr>
+                            {% if development_instances %}
+                                 <tr>
+                                    <td class="role" colspan="3">
+                                        <b>Developing</b>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% for instance in development_instances %}
+                                {% if month == instance.month and year.year == instance.year %}
+
+                                    <tr>
+                                        <td colspan="3">
+                                            {{ instance.code }} - {{ instance.name }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if lecturer_instances %}
+                                 <tr>
+                                    <td class="role" colspan="3">
+                                        <b>Delivering</b>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% for instance in lecturer_instances %}
+                                {% if month in instance.months and year.year == instance.year %}
+                                    <tr>
+                                        <td colspan="3">
+                                            {{ instance.code }} - {{ instance.name }}
+                                            <br>
+                                            Student Count: {{ instance.student_count }}
+                                            <br>
+                                            Assistant:
+                                                {% if instance.assistant %}
+                                                    {{ instance.assistant }}
+                                                {% else %}
+                                                    None
+                                                {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if assistant_instances %}
+                                 <tr>
+                                    <td class="role" colspan="3">
+                                        <b>Assisting</b>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            {% for instance in assistant_instances %}
+                                {% if month in instance.months and year.year == instance.year %}
+                                    <tr>
+                                        <td colspan="3">
+                                            {{ instance.code }} - {{ instance.name }}
+                                            <br>
+                                            Student Count: {{ instance.student_count }}
+                                            <br>
+                                            Lecturer:
+                                                {% if instance.lecturer %}
+                                                    {{ instance.lecturer }}
+                                                {% else %}
+                                                    None
+                                                {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <br>
+                <h2>Complete Schedule</h2>
+                <table class="table">
+            {% for year in schedule_dates %}
+                <tr>
+                    <th colspan="3">
+                        <h3>{{ year.year }}</h3>
+                    </th>
+                </tr>
+                {% for month in all_months %}
+                    <tr>
+                        <td class="month" colspan="3">
+                            <h4>{{ month }}</h4>
+                        </td>
+                    </tr>
+                    {% if development_instances %}
+                        <tr>
+                            <td class="role" colspan="3">
+                                <b>Developing</b>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% for instance in development_instances %}
+                        {% if month == instance.month and year.year == instance.year %}
+                            <tr>
+                                <td class="role" colspan="3">
+                                    <b>{{instance.role}}</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    {{ instance.code }} - {{ instance.name }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    {% if lecturer_instances %}
+                        <tr>
+                            <td class="role" colspan="3">
+                                <b>Delivering</b>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% for instance in lecturer_instances %}
+                        {% if month in instance.months and year.year == instance.year %}
+                            <tr>
+                                <td colspan="3">
+                                    {{ instance.code }} - {{ instance.name }}
+                                    <br>
+                                    Student Count: {{ instance.student_count }}
+                                    <br>
+                                    Assistant:
+                                        {% if instance.assistant %}
+                                            {{ instance.assistant }}
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    {% if assistant_instances %}
+                         <tr>
+                            <td class="role" colspan="3">
+                                <b>Assisting</b>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% for instance in assistant_instances %}
+                        {% if month in instance.months and year.year == instance.year %}
+                            <tr>
+                                <td colspan="3">
+                                    {{ instance.code }} - {{ instance.name }}
+                                    <br>
+                                    Student Count: {{ instance.student_count }}
+                                    <br>
+                                    Lecturer:
+                                        {% if instance.lecturer %}
+                                            {{ instance.lecturer }}
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        </table>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
+</body>
+</html>

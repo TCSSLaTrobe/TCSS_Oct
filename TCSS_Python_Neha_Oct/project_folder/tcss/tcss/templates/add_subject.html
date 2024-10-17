@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Subject</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    h1, h2, h3, h4, h5, h6 {
+    color: #333; /* Dark grey color for contrast */
+    text-shadow: 1px 1px 2px white; /* Optional: adds a subtle shadow for better legibility */
+  }
+
+  .nav-item a {
+    display: block; /* Ensures the link fills the container */
+    background-color: #e8f4f8; /* Light blue for a soft appearance */
+    color: #333; /* Darker text for better contrast */
+    padding: 10px 15px; /* Ample padding for clickable area */
+    margin: 5px 0; /* Margins removed from the sides */
+    border-radius: 5px; /* Smooth, rounded corners */
+    border: 1px solid #b6d4e7; /* Light blue border that complements the background */
+    text-decoration: none; /* Removes underline */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  }
+
+  .nav-item a:hover, .nav-item a.active {
+    background-color: #fcb69f; /* Soft peach color for a gentle hover effect */
+    color: #fff; /* White text to stand out on hover */
+    border-color: #fa8072; /* Slightly darker border on hover to define edges */
+  }
+  .navbar-dark .navbar-nav .nav-link {
+    color: black; /* Changes text color to black */
+  }
+
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: #ff6347; /* Keeps the hover color as vibrant tomato red */
+  }
+
+  .nav-item text-nowrap {
+    color: black;
+  }
+  .nav-link:hover {
+    color: #ff6347; /* Vibrant tomato red on hover for better visibility */
+  }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">TCSS</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+      data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" href="/logout">Sign out</a>
+      </li>
+    </ul>
+  </nav>
+
+  {% if account_level < 3 %}
+  <div class="container-fluid">
+    <div class="row">
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            {% if account_level == 1 %}
+            <li class="nav-item">
+              <a class="nav-link" href="/view_lecturers">
+                <span data-feather="fulltime lecturers"></span>
+                Manage Lecturers
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/view_subjects">
+                <span data-feather="manage subjects"></span>
+                Manage Subjects
+              </a>
+            </li>
+             <li class="nav-item">
+              <a class="nav-link" href="/manage_schedule">
+                <span data-feather="manage schedule"></span>
+                Manage Schedule
+              </a>
+            </li>
+            {% endif %}
+            {% if account_level == 2 %}
+            <li class="nav-item">
+              <a class="nav-link" href="/manage_schedule">
+                <span data-feather="manage schedule"></span>
+                Manage Schedule
+              </a>
+            </li>
+            {% endif %}
+            </ul>
+        </div>
+      </nav>
+  {% endif %}
+<div class="container mt-5">
+    <h2>Add Subject</h2>
+    <form method="POST" action="/add_subject">
+        <div class="form-group">
+            <label for="subject_code">Code</label>
+            <input type="text"  class="form-control" id="subject_code" name="subject_code" style="width: 10%;" required>
+        </div>
+        <div class="form-group">
+            <label for="subject_name">Name</label>
+            <input type="text" class="form-control" id="subject_name" name="subject_name" style="width: 40%;" required>
+        </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+</div>
+</body>
+</html>
