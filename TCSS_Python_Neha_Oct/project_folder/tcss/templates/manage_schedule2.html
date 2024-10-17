@@ -1,18 +1,19 @@
-<!--
-@author [Alecia Sutherland]
-@email [example@mail.com]
-@create date 2024-08-03 12:30:32
-@modify date 2024-08-03 12:30:32
-@desc [Full-time lecturers]
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subjects</title>
+    <title>Schedule</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+    <style>
+        .tbl_schedule td {
+            border: 1px solid #bdbdbd;
+            font-size: 100%;
+            padding: 0.25rem;
+            min-width: 45px;
+        }
 <style>
     h1, h2, h3, h4, h5, h6 {
     color: #333; /* Dark grey color for contrast */
@@ -55,7 +56,7 @@
 
 <body>
   <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="/home">TCSS</a>
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">TCSS</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
       data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -81,13 +82,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/view_subjects">
+              <a class="nav-link" href="/view_subjects">
                 <span data-feather="manage subjects"></span>
                 Manage Subjects
               </a>
             </li>
              <li class="nav-item">
-              <a class="nav-link" href="/manage_schedule">
+              <a class="nav-link active" aria-current="page" href="/manage_schedule">
                 <span data-feather="manage schedule"></span>
                 Manage Schedule
               </a>
@@ -101,7 +102,7 @@
             {% endif %}
             {% if account_level == 2 %}
             <li class="nav-item">
-              <a class="nav-link" href="/manage_schedule">
+              <a class="nav-link active" aria-current="page" href="/manage_schedule">
                 <span data-feather="manage schedule"></span>
                 Manage Schedule
               </a>
@@ -117,56 +118,66 @@
         </div>
       </nav>
   {% endif %}
-
-    <!-- Subjects List -->
-    <div id="lecturers" class="container mt-5">
-        <h2>Manage Subjects</h2>
-        <div class="form-group">
-            <form action="/add_subject">
-                <button type="submit" class="btn btn-primary btn-custom">Add New Subject</button>
-            </form>
-        </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Subject Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="subject-table-body">
-            {% for subject in subjects %}
-                <tr>
-                    <td>{{ subject.code }}</td>
-                    <td>{{ subject.name }}</td>
-                    <td>
-                        <form method="POST" action="/add_development">
-                            <input type="hidden" name="subject_id" value="{{ subject.id }}"/>
-                            <button type="submit" class="btn btn-info">Add Development</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="POST" action="/edit_subject">
-                            <input type="hidden" name="subject_id" value="{{ subject.id }}"/>
-                            <button type="submit"  class="btn btn-warning">Edit</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="POST" action="/delete_subject">
-                            <input type="hidden" name="subject_id" value="{{ subject.id }}"/>
-                            <button class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+    <table class="tbl_schedule">
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% for year in calendar_dates %}
+                <td colspan={{year.months|length}}>
+                    {{ year.year }}
+                </td>
             {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+        </tr>
+        <tr>
+            <td>Code</td>
+            <td>Subject Name</td>
+            <td></td>
+            {% for year in calendar_dates %}
+                {% for month in year.months %}
+                    <td class="month">{{ month.month_name }}</td>
+                {% endfor %}
+            {% endfor %}
+        </tr>
+        {% for subject in schedule_data %}
+            <tr>
+                <td>{{ subject.subject_code }}</td>
+                <td>{{ subject.subject_name }}</td>
+                <td>
+                    <form method="POST" action="/new_instance">
+                        <button class="btn btn-primary" name="subject_id"
+                                value="{{ subject.subject_id }}">
+                             Add
+                        </button>
+                    </form>
+                </td>
+                {% for year in calendar_dates %}
+                    {% for month in year.months %}
+                        <td>
+                            {% for instance in subject.instances %}
+                                {% if instance.instance_start_id == month.start_id %}
+                                    {% if instance.instance_lecturer_id %}
+                                        <form method="POST" action="/view_instance">
+                                            <button class="btn btn-success btn-block" type="submit" name="instance_id"
+                                                    value="{{ instance.instance_id }}">
+                                                <br>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="/view_instance">
+                                            <button class="btn btn-danger btn-block" type="submit" name="instance_id"
+                                                    value="{{ instance.instance_id }}">
+                                                <br>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>

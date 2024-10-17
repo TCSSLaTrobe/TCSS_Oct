@@ -1,7 +1,55 @@
 import sqlite3
+from turtledemo.penrose import start
 
 from sqlalchemy.engine import connection_memoize
 
+def generate_schedule_data():
+    connection = sqlite3.connect('tcss.db')
+    cursor = connection.cursor()
+    cursor.execute('''
+               SELECT id, code, name
+                FROM subjects;
+           ''')
+    data = cursor.fetchall()
+
+    subjects = []
+    for item in data:
+        subject = {"subject_id": item[0],
+                   "subject_code": item[1],
+                   "subject_name": item[2],
+                   "instances": []
+                   }
+        subjects.append(subject)
+
+    cursor.execute('''
+        SELECT id, subject_id, start_id, lecturer_id
+        FROM instances;
+    ''')
+    data = cursor.fetchall()
+
+    cursor.execute('''
+            SELECT calendar.id, calendar.month, calendar.month_name, calendar.year
+            FROM instances
+            JOIN calendar
+            ON instances.start_id = calendar.id
+            GROUP BY instances.start_id;
+            ''')
+    calendar_length = len(cursor.fetchall())
+
+    instances = []
+    for item in data:
+        instance = {"instance_id": item[0],
+                    "subject_id": item[1],
+                    "instance_start_id": item[2],
+                    "instance_lecturer_id": item[3]
+                    }
+        instances.append(instance)
+
+    for subject in subjects:
+        for instance in instances:
+            if instance["subject_id"] == subject["subject_id"]:
+                subject["instances"].append(instance)
+    return subjects
 
 def generate_instance_dates():
     connection  = sqlite3.connect('tcss.db')
@@ -26,22 +74,47 @@ def generate_calendar_dates():
     connection = sqlite3.connect('tcss.db')
     cursor = connection.cursor()
     cursor.execute('''
-        SELECT calendar.year, calendar.month, calendar.month_name
+        SELECT calendar.year
+        FROM instances
+        JOIN calendar 
+        ON instances.start_id = calendar.id
+        GROUP BY calendar.year;
+    ''')
+    data = cursor.fetchall()
+
+    years = []
+    for item in data:
+        year = {"year": item[0],
+                "months": []
+                }
+        years.append(year)
+
+    cursor.execute('''
+        SELECT calendar.id, calendar.month, calendar.month_name, calendar.year
         FROM instances
         JOIN calendar 
         ON instances.start_id = calendar.id
         GROUP BY instances.start_id;
         ''')
     data = cursor.fetchall()
-    connection.close()
 
-    dates = {}
+    months = []
+    for item in data:
+        month = {"start_id": item[0],
+                 "month_num": item[1],
+                 "month_name": item[2][:3].upper(),
+                 "year": item[3]
+                 }
+        months.append(month)
 
-    for year,month, month_name in data:
-        if year not in dates:
-            dates[year] = {}
-        dates[year][month] = month_name[:3].upper()
-    return dates
+    for year in years:
+        for month in months:
+            if month["year"] == year["year"]:
+                year["months"].append(month)
+
+    calendar_dates = years
+
+    return calendar_dates
 
 def generate_subject_data():
     connection = sqlite3.connect('tcss.db')
@@ -134,4 +207,70 @@ def generate_assigned_lecturers():
         }
 
     return assigned_lecturers
+
+def update_instance(instance_id, lecturer_id, assistant_id, student_count):
+    if not lecturer_id:
+        lecturer_id = None
+
+    if not assistant_id:
+        assistant_id = None
+
+    connection = sqlite3.connect('tcss.db')
+    cursor = connection.cursor()
+    cursor.execute('''
+        UPDATE instances
+        SET student_count = ?,
+        lecturer_id = ?,
+        assistant_id = ?
+        WHERE id = ? 
+    ''',(student_count,lecturer_id, assistant_id, instance_id))
+
+    connection.commit()
+    connection.close()
+
+    return
+
+def create_instance(subject_id, student_count, instance_month, instance_year):
+
+    connection = sqlite3.connect('tcss.db')
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        SELECT MIN(id)
+        FROM calendar
+        WHERE month_name = ?
+        AND year = ?
+    ''',(instance_month,instance_year))
+    start_id = cursor.fetchone()[0]
+
+    cursor.execute('''
+        SELECT id
+        FROM calendar
+        WHERE full_date = 
+            (SELECT three_months
+            FROM calendar
+            WHERE id = ?)
+    ''',(start_id,))
+    end_id = cursor.fetchone()[0]
+
+    cursor.execute('''
+        INSERT INTO instances (subject_id, start_id, end_id, student_count, workload_value)
+        VALUES (?,?,?,?, 0.0)
+    ''',(subject_id,start_id,end_id,student_count))
+    #
+    connection.commit()
+    connection.close()
+    return
+
+def delete_instance(instance_id):
+    connection = sqlite3.connect('tcss.db')
+    cursor = connection.cursor()
+    cursor.execute('''
+        DELETE FROM instances
+        WHERE id = ?
+    ''',(instance_id,))
+
+    connection.commit()
+    connection.close()
+    return
 

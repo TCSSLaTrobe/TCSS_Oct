@@ -13,58 +13,152 @@
     <title>Manage Lecturers - TCSS</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .container {
+        margin-left: 20%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+    color: #333; /* Dark grey color for contrast */
+    text-shadow: 1px 1px 2px white; /* Optional: adds a subtle shadow for better legibility */
+  }
 
+  .nav-item a {
+    display: block; /* Ensures the link fills the container */
+    background-color: #e8f4f8; /* Light blue for a soft appearance */
+    color: #333; /* Darker text for better contrast */
+    padding: 10px 15px; /* Ample padding for clickable area */
+    margin: 5px 0; /* Margins removed from the sides */
+    border-radius: 5px; /* Smooth, rounded corners */
+    border: 1px solid #b6d4e7; /* Light blue border that complements the background */
+    text-decoration: none; /* Removes underline */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  }
+
+  .nav-item a:hover, .nav-item a.active {
+    background-color: #fcb69f; /* Soft peach color for a gentle hover effect */
+    color: #fff; /* White text to stand out on hover */
+    border-color: #fa8072; /* Slightly darker border on hover to define edges */
+  }
+  .navbar-dark .navbar-nav .nav-link {
+    color: black; /* Changes text color to black */
+  }
+
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: #ff6347; /* Keeps the hover color as vibrant tomato red */
+  }
+
+  .nav-item text-nowrap {
+    color: black;
+  }
+  .nav-link:hover {
+    color: #ff6347; /* Vibrant tomato red on hover for better visibility */
+  }
+  </style>
 </head>
+
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/dashboard">TCSS</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#lecturers">Full-Time Lecturers</a>
-                </li>
+  <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">TCSS</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+      data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+        <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" href="/logout">Sign out</a>
+      </li>
+    </ul>
+  </nav>
+
+  {% if account_level < 3 %}
+  <div class="container-fluid">
+    <div class="row">
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <div class="position-sticky pt-3">
+          <ul class="nav flex-column">
+            {% if account_level == 1 %}
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/view_lecturers">
+                <span data-feather="fulltime lecturers"></span>
+                Manage Lecturers
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/view_subjects">
+                <span data-feather="manage subjects"></span>
+                Manage Subjects
+              </a>
+            </li>
+             <li class="nav-item">
+              <a class="nav-link" href="/manage_schedule">
+                <span data-feather="manage schedule"></span>
+                Manage Schedule
+              </a>
+            </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
+            </li>
+            {% endif %}
+            {% if account_level == 2 %}
+            <li class="nav-item">
+              <a class="nav-link" href="/manage_schedule">
+                <span data-feather="manage schedule"></span>
+                Manage Schedule
+              </a>
+            </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
+            </li>
+            {% endif %}
             </ul>
         </div>
-    </nav>
-
+      </nav>
+  {% endif %}
     <!-- Full-Time Lecturers Section -->
-    <div id="lecturers" class="container">
+    <div id="lecturers" class="container mt-5 w-auto">
         <h2>Manage Lecturers</h2>
-<!--        <div class="form-group">-->
-<!--            <input type="text" class="form-control" id="search" placeholder="Search by name or department">-->
-<!--        </div>-->
-        <form action="/add_lecturer">
-            <button type="submit" class="btn btn-primary btn-custom">Add New Lecturer</button>
-        </form>
+        <div class="form-group">
+            <form action="/add_lecturer">
+                <button type="submit" class="btn btn-primary btn-custom">Add New Lecturer</button>
+            </form>
+        </div>
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
-                    <th>Subject Expertise</th>
-                    <th>Actions</th>
+                    <th>Employment Type</th>
+                    <th>{{ date.month }} Workload</th>
+                    <th>Expertise</th>
                 </tr>
             </thead>
             <tbody id="lecturer-table-body">
             {% for lecturer in lecturer_data %}
                 <tr>
-                    <td>{{ lecturer.id }}</td>
                     <td>{{ lecturer.name }}</td>
-                    <td>{% for subject in lecturer.expertise %}
-                        {{ subject }} <br>
-                        {% endfor %}</td>
+                    <td>{{ lecturer.employment }}</td>
+                    <td>{{ lecturer.workload }}</td>
+                    <td>
+                        {% for subject in lecturer.expertise %}
+                            {{ subject }}
+                            <br>
+                        {% endfor %}
+                    </td>
                     <td>
                         <form method="POST" action="/edit_lecturer">
                             <input type="hidden" name="lecturer_id" value="{{ lecturer.id }}"/>
-                            <button type="submit"  class="btn btn-info btn-sm">Edit</button>
+                            <button type="submit"  class="btn btn-warning">Edit</button>
                         </form>
+                    </td>
+                    <td>
                         <form method="POST" action="/delete_lecturer">
                             <input type="hidden" name="lecturer_id" value="{{ lecturer.id }}"/>
-                            <button class="btn btn-danger btn-sm">Delete</button>
+                            <button class="btn btn-danger">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -72,42 +166,6 @@
             </tbody>
         </table>
     </div>
-
-    <!-- Lecturer Modal -->
-    <div class="modal fade" id="lecturerModal" tabindex="-1" role="dialog" aria-labelledby="lecturerModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="lecturerModalLabel">Add/Edit Lecturer</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="lecturer-form">
-                        <div class="form-group">
-                            <label for="lecturer-name">Name</label>
-                            <input type="text" class="form-control" id="lecturer-name" placeholder="Enter name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lecturer-expertise">Subject Expertise</label>
-                            <select id="lecturer-expertise" multiple="multiple" required>
-                                <option value="subject 1">Subject 1</option>
-                                <option value="subject 2">Subject 2</option>
-                            </select>
-                        </div>
-                        <input type="hidden" id="lecturer-id">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 </html>

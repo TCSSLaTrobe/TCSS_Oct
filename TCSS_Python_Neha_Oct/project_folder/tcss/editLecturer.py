@@ -5,6 +5,20 @@ def generate_lecturer_data(lecturer_id):
     cursor = connection.cursor()
 
     cursor.execute('''
+        SELECT id, name, load
+        FROM lecturers
+        WHERE id = ?
+    ''',(lecturer_id,))
+    data = cursor.fetchall()[0]
+
+    lecturer = {
+        "id": data[0],
+        "name": data[1],
+        "employment": data[2],
+        "expertise": []
+    }
+
+    cursor.execute('''
         SELECT lecturers.id, lecturers.name, lecturers.load, subjects.code, subjects.name FROM lecturer_sme
         JOIN lecturers
         ON lecturers.id = lecturer_sme.lecturer_id
@@ -13,13 +27,7 @@ def generate_lecturer_data(lecturer_id):
         WHERE lecturers.id = ?
     ''',(lecturer_id,))
     lecturer_data = cursor.fetchall()
-
-    lecturer = {
-        "id": lecturer_id,
-        "name": lecturer_data[0][1],
-        "load": lecturer_data[0][2],
-        "expertise": []
-    }
+    print(lecturer_data)
 
     for lecturer_tuple in lecturer_data:
         lecturer["expertise"].append(lecturer_tuple[3] + "-" + lecturer_tuple[4])
@@ -46,8 +54,8 @@ def generate_sme(lecturer_id):
     cursor.execute('''
             SELECT subject_id 
             FROM lecturer_sme 
-            WHERE lecturer_id =  
-        ''' + lecturer_id)
+            WHERE lecturer_id = ? 
+        ''',(lecturer_id,))
     rows = cursor.fetchall()
     lecturer_sme = [row['subject_id'] for row in rows]
 

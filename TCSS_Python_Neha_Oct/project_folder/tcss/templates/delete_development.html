@@ -1,19 +1,10 @@
-<!--
-@author [Alecia Sutherland]
-@email [example@mail.com]
-@create date 2024-09-09 14:07:08
-@modify date 2024-09-09 14:07:08
-@desc [HTML Homepage code]
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TCSS Homepage- Site</title>
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
-  <style>
+    <meta charset="UTF-8">
+    <title>Delete Subject</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
     h1, h2, h3, h4, h5, h6 {
     color: #333; /* Dark grey color for contrast */
     text-shadow: 1px 1px 2px white; /* Optional: adds a subtle shadow for better legibility */
@@ -87,10 +78,16 @@
               </a>
             </li>
              <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/manage_schedule">
+              <a class="nav-link" href="/manage_schedule">
                 <span data-feather="manage schedule"></span>
                 Manage Schedule
               </a>
+             </li>
+            <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
             </li>
             {% endif %}
             {% if account_level == 2 %}
@@ -100,17 +97,41 @@
                 Manage Schedule
               </a>
             </li>
+              <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
+            </li>
             {% endif %}
             </ul>
         </div>
       </nav>
   {% endif %}
-
-    <div class="container">
-      <h2 class="h2 dashboard">Dashboard</h2>
-      <table><tr><td>HELLO</td></tr></table>
-    </div>
-  </div>
-
+<div class="container mt-5">
+    <h2>Delete Planned Development</h2>
+    <form method="POST" action="/confirm_delete_development">
+        <div class="form-group">
+            <label>Subject Name</label>
+            <input readonly type="text" class="form-control" name="subject_name" value="{{ instance.subject_name }}"
+                   placeholder="{{ instance.subject_name }}">
+        </div>
+        <div class="form-group">
+            <label>Lecturer Name</label>
+            <input readonly type="text" class="form-control" name="lecturer_name" value="{{ instance.lecturer_name }}"
+                   placeholder="{{ instance.lecturer_name }}">
+        </div>
+        <div class="form-group">
+            <label>Period</label>
+            <input readonly type="text" class="form-control" name="period" value="{{ instance.period }}"
+                   placeholder="{{ instance.period }}">
+        </div>
+        <div class="form-group">
+            <label>Are you sure? This action cannot be undone</label>
+            <input type="hidden" name="instance_id" value="{{ instance.id }}"/>
+        </div>
+            <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
 </body>
 </html>

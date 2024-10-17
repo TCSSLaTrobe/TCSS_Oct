@@ -1,19 +1,19 @@
 <!--
 @author [Alecia Sutherland]
 @email [example@mail.com]
-@create date 2024-09-09 14:07:08
-@modify date 2024-09-09 14:07:08
-@desc [HTML Homepage code]
+@create date 2024-08-03 12:30:32
+@modify date 2024-08-03 12:30:32
+@desc [Full-time lecturers]
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TCSS Homepage- Site</title>
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css">
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Development</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
     h1, h2, h3, h4, h5, h6 {
     color: #333; /* Dark grey color for contrast */
     text-shadow: 1px 1px 2px white; /* Optional: adds a subtle shadow for better legibility */
@@ -55,7 +55,7 @@
 
 <body>
   <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">TCSS</a>
+    <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="/home">TCSS</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
       data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -87,10 +87,16 @@
               </a>
             </li>
              <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/manage_schedule">
+              <a class="nav-link" href="/manage_schedule">
                 <span data-feather="manage schedule"></span>
                 Manage Schedule
               </a>
+            </li>
+              <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
             </li>
             {% endif %}
             {% if account_level == 2 %}
@@ -100,17 +106,50 @@
                 Manage Schedule
               </a>
             </li>
+              <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/manage_development">
+                    <span data-feather="manage development"></span>
+                    Subject Development
+                  </a>
+            </li>
             {% endif %}
             </ul>
         </div>
       </nav>
   {% endif %}
 
-    <div class="container">
-      <h2 class="h2 dashboard">Dashboard</h2>
-      <table><tr><td>HELLO</td></tr></table>
+    <div id="lecturers" class="container mt-5">
+        <h2>Planned Subject Development</h2>
+<!--        <div class="form-group">-->
+<!--            <form action="/add_development">-->
+<!--                <button type="submit" class="btn btn-primary btn-custom">Add New</button>-->
+<!--            </form>-->
+<!--        </div>-->
+        <table class="table table-bordered w-auto">
+            <thead>
+                <tr>
+                    <th>Subject Name</th>
+                    <th>Lecturer</th>
+                    <th>Period</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="subject-table-body">
+            {% for instance in development_instances %}
+                <tr>
+                    <td>{{ instance.subject_name }}</td>
+                    <td>{{ instance.lecturer_name }}</td>
+                    <td>{{ instance.period }}</td>
+                    <td>
+                        <form method="POST" action="/delete_development">
+                            <input type="hidden" name="instance_id" value="{{ instance.id }}"/>
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-  </div>
-
 </body>
 </html>
