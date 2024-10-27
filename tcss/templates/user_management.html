@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div id="lecturers" class="container mt-5 w-auto">
+    <h2>User Management</h2>
+    <hr>
+    <div class="form-group">
+            <form action="/create_user">
+                <button type="submit" class="btn btn-primary btn-custom">Create User</button>
+            </form>
+        </div>
+    <table class="table table-bordered">
+        <tr>
+            <th>
+                Email
+            </th>
+            <th>
+                Role
+            </th>
+            <th colspan="2">Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+                <form method="POST" action="/edit_user">
+                    <input type="hidden" name="user_id" value="{{ user.id }}"/>
+                    <button type="submit"  class="btn btn-warning">Edit</button>
+                </form>
+            </td>
+            <td>
+                <form method="POST" action="/delete_user">
+                    <input type="hidden" name="user_id" value="{{ user.id }}"/>
+                    <button class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

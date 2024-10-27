@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <table class="tbl_schedule">
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% for year in calendar_dates %}
+                <td colspan={{year.months|length}}>
+                    {{ year.year }}
+                </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td>Code</td>
+            <td>Subject Name</td>
+            <td></td>
+            {% for year in calendar_dates %}
+                {% for month in year.months %}
+                    <td class="month">{{ month.month_name }}</td>
+                {% endfor %}
+            {% endfor %}
+        </tr>
+        {% for subject in schedule_data %}
+            <tr>
+                <td>{{ subject.subject_code }}</td>
+                <td>{{ subject.subject_name }}</td>
+                <td>
+                    <form method="POST" action="/new_instance">
+                        <button class="btn btn-primary" name="subject_id"
+                                value="{{ subject.subject_id }}">
+                             Add
+                        </button>
+                    </form>
+                </td>
+                {% for year in calendar_dates %}
+                    {% for month in year.months %}
+                        <td>
+                            {% for instance in subject.instances %}
+                                {% if instance.instance_start_id == month.start_id %}
+                                    {% if instance.instance_lecturer_id %}
+                                        <form method="POST" action="/view_instance">
+                                            <button class="btn btn-success btn-block" type="submit" name="instance_id"
+                                                    value="{{ instance.instance_id }}">
+                                                <br>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="/view_instance">
+                                            <button class="btn btn-danger btn-block" type="submit" name="instance_id"
+                                                    value="{{ instance.instance_id }}">
+                                                <br>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
