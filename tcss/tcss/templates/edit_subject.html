@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Subject</h2>
+    <hr>
+    <form method="POST" action="/update_subject">
+        <div class="form-group">
+            <label for="subject_code">Code</label>
+            <input type="text"  class="form-control" id="subject_code" name="subject_code" value="{{ subject.code }}"
+                   placeholder="{{ subject.code }}" style="width: 30%;" required>
+        </div>
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label for="subject_name">Name</label>
+            <input type="text" class="form-control" id="subject_name" name="subject_name" value="{{ subject.name }}"
+                   placeholder="{{ subject.name }}" pattern="[a-zA-Z 0-9]+" required>
+        </div>
+        <div  class="form-group">
+            <label>Instances: {{ subject.instances }}</label>
+        </div>
+            <input type="hidden" name="subject_id" value="{{ subject.id }}"/>
+            <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}

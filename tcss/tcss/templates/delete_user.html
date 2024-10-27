@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Delete User</h2>
+    <hr>
+    <form method="POST" action="/confirm_delete_user">
+        <div class="form-group">
+            <label>Email</label>
+            <input readonly type="text" class="form-control" name="user_email"
+                   value="{{ user_data.email }}" placeholder="{{ user_data.email }}">
+        </div>
+        <div class="form-group">
+            <label>Role</label>
+            <input readonly type="text" class="form-control" name="user_role"
+                   value="{{ user_data.rle }}" placeholder="{{ user_data.role }}">
+        </div>
+        <div class="form-group">
+            <label>Are you sure? This action cannot be undone</label>
+            <input type="hidden" name="user_id" value="{{ user_data.id }}"/>
+         </div>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
+{% endblock %}

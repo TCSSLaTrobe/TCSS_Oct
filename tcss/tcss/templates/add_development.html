@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container mt-5 w-25">
+        <div>
+            <h2>Add Development Period</h2>
+            <form id="year_form" method="POST" action="/year_select_dev"></form>
+            <form id="month_form" method="POST" action="/month_select_dev"></form>
+            <form id="dev_form" method="POST" action="/submit_dev"></form>
+            <hr>
+                <div class="form-group">
+                    <label>Subject</label>
+                    {% if subject %}
+                        <input readonly class="form-control" value="{{ subject.code }} - {{ subject.name }}">
+                    {% else %}
+                        <select class="form-control" form="year_form" name="subject_id">
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}">
+                                    {{ subject.code }} - {{ subject.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <div class="input-group">
+                        <select class="form-control" form="year_form" name="dev_year">
+                            {% for year in dates %}
+                                <option value="{{ year.year }}"
+                                    {% if year.year == selected_year %}
+                                        selected
+                                    {% endif %}>
+                                    {{ year.year }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                         <div class="input-group-append">
+                           <button form="year_form" type="submit" class="btn btn-primary">Select</button>
+                        </div>
+                    </div>
+                        {% if months %}
+                            <div class="input-group mt-2 mb-2">
+                                <select class="form-control" form="month_form" name="dev_month">
+                                    {% for month in months %}
+                                        <option value="{{ month }}"
+                                        {% if month == selected_month %}
+                                            selected
+                                        {% endif %}>
+                                            {{ month }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                 <div class="input-group-append">
+                                   <button form="month_form" type="submit" class="btn btn-primary">Select</button>
+                                </div>
+                        {% else %}
+                        <div class="alert alert-danger" role="alert">
+                          Select Year before progressing
+                        </div>
+                        {% endif %}
+                </div>
+                {% if possible_lecturers %}
+                    <div class="form-group">
+                        <label>Assigned Lecturer</label>
+                            <select class="form-control" form="dev_form" name="lecturer_id">
+                                {% for lecturer in possible_lecturers %}
+                                    <option value="{{ lecturer.id }}">
+                                        {{ lecturer.name }} - load: {{ lecturer.workload }}% (+{{ lecturer.added_load}}%)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger" role="alert">
+                      Select Month before progressing
+                    </div>
+                {% endif %}
+            {% if subject %}
+                <input type="hidden" form="year_form" name="subject_id" value="{{ subject.id }}">
+                <input type="hidden" form="month_form" name="subject_id" value="{{ subject.id }}">
+                <input type="hidden" form="dev_form" name="subject_id" value="{{ subject.id }}">
+            {% endif %}
+            <input type="hidden" name="dev_year2" form="month_form" value="{{ selected_year }}">
+            <input type="hidden" name="start_id" form="dev_form" value="{{ selected_year }}, {{ selected_month }}">
+            <button type="submit" form="dev_form" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+{% endblock %}
